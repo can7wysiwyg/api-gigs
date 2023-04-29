@@ -5,12 +5,31 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verify = require("../middleware/verify");
 const authAdmin = require("../middleware/authAdmin");
+const multer = require("multer");
+const path = require('path');
+const fs = require("fs");
 
 
-Auth.post('/auth/register', asyncHandler(async(req, res) => {
-    const{username, email, password} = req.body
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.resolve(__dirname, '..', 'public'));
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString().replace(/:/g, "-") + file.originalname);
+  },
+});
 
-    if(!username || !email || !password) res.json({msg: "fields cannot be blank"})
+
+const upload = multer({ storage });
+
+
+
+
+
+Auth.post('/auth/register', upload.single("userImage"), asyncHandler(async(req, res) => {
+    const{fullname, username, email, password, phoneNumber, securityAnswer} = req.body
+
+    if(!fullname || !username || !email || !password || !phoneNumber || !securityAnswer) res.json({msg: "fields cannot be blank"})
 
 
     const usernameExists = await  User.findOne({ username });
@@ -31,8 +50,15 @@ Auth.post('/auth/register', asyncHandler(async(req, res) => {
   const hashedPassword = await  bcrypt.hash(password, salt);
 
    await User.create({
+    fullname,
     username,
     email,
+    phoneNumber,
+    securityAnswer,
+    userImage: { 
+      data: fs.readFileSync("./public/" + req.file.filename),
+      contentType: "image/jpg"
+      },
     password: hashedPassword
   })
 
@@ -81,9 +107,6 @@ Auth.post("/auth/login", asyncHandler(async(req, res) => {
     
 }))
 
-Auth.get("/auth/smurf", verify, authAdmin, asyncHandler(async(req, res) => {
-    res.json({msg: "wassup doc!!"})
-}))
 
 
 const createAccessToken = (user) =>{
