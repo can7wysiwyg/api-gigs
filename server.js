@@ -7,6 +7,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const path = require('path')
 const Auth = require('./routes/Auth')
+const SubjectRouter = require("./routes/SubjectRoute")
 
 
 
@@ -28,6 +29,7 @@ db.once('open', function(){
 
 
   app.use(Auth)
+  app.use(SubjectRouter)
 
 
 

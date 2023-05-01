@@ -13,12 +13,18 @@ const SubjectSchema = mongoose.Schema({
     subjectPrice: {
         type: String,
         required: true
+    },
+    subjectCommentary: {
+        type: String,
+        required: true
     }
 
 
 }, {
     timestamps: true
 })
+
+
 
 
 module.exports = mongoose.model('Subject', SubjectSchema)
