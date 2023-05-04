@@ -8,7 +8,12 @@ const QualificationSchema = mongoose.Schema({
     qualification: {
         type: String
     },
-    tutorSpecialty1: {
+    qualificationImage: {
+
+        data: Buffer,
+    contentType: String,
+     },
+   tutorSpecialty1: {
         type: String,
         required: true
     },

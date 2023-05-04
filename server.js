@@ -8,6 +8,8 @@ const cookieParser = require('cookie-parser')
 const path = require('path')
 const Auth = require('./routes/Auth')
 const SubjectRouter = require("./routes/SubjectRoute")
+const QualiRoute = require("./routes/QualificationRoute")
+const RatingRoute = require("./routes/RatingRoute")
 
 
 
@@ -30,6 +32,8 @@ db.once('open', function(){
 
   app.use(Auth)
   app.use(SubjectRouter)
+  app.use(QualiRoute)
+  app.use(RatingRoute)
 
 
 
