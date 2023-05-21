@@ -22,11 +22,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// 
+// upload.single("userImage"),
 
 
-
-
-Auth.post('/auth/register', upload.single("userImage"), asyncHandler(async(req, res) => {
+Auth.post('/auth/register',  asyncHandler(async(req, res) => {
     const{fullname, username, email, password, phoneNumber, securityAnswer} = req.body
 
     if(!fullname || !username || !email || !password || !phoneNumber || !securityAnswer) res.json({msg: "fields cannot be blank"})
@@ -55,10 +55,10 @@ Auth.post('/auth/register', upload.single("userImage"), asyncHandler(async(req, 
     email,
     phoneNumber,
     securityAnswer,
-    userImage: { 
-      data: fs.readFileSync("./public/" + req.file.filename),
-      contentType: "image/jpg"
-      },
+    // userImage: { 
+    //   data: fs.readFileSync("./public/" + req.file.filename),
+    //   contentType: "image/jpg"
+    //   },
     password: hashedPassword
   })
 
@@ -156,6 +156,34 @@ Auth.put(
   })
 );
 
+Auth.get('/auth/user',verify, asyncHandler(async(req, res) => {
+  try{
+    const user = await User.findById(req.user).select('-password')
+    if(!user) return res.status(400).json({msg: "User does not exist."})
+  
+    res.json(user)
+  // console.log(user);
+  
+  // res.json(req.user)
+  
+  }
+    catch(err) {
+      return res.status(500).json({msg: err.message})
+  
+  
+    }
+  
+  
+  }))
+
+
+  Auth.get('/auth/users', asyncHandler(async(req, res) => {
+
+    const results = await User.find()
+    res.json(results)
+
+  }))
+  
 
 
 

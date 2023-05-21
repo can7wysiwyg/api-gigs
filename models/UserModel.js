@@ -6,6 +6,9 @@ const UserSchema = mongoose.Schema({
     data: Buffer,
     contentType: String,
 
+    
+    
+
    },
    fullname: {
     type: String,
@@ -42,15 +45,19 @@ const UserSchema = mongoose.Schema({
     },
     facebookLink: {
         type: String,
+        default: " "
     },
     whatsappLink: {
         type: String,
+        default: ""
     },
     twitterLink: {
         type: String,
+        default: ""
     },
     linkedInLink: {
         type: String,
+        default: ""
     }
     
     

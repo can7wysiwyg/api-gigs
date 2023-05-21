@@ -26,8 +26,8 @@ QualiRoute.post(
     const { qualification, tutorSpecialty1, tutorSpecialty2, tutorSpecialty3 } =
       req.body;
 
-    if (!tutorSpecialty1)
-      res.json({ msg: "you need to have at least one tutoring specialty!" });
+    if (!tutorSpecialty1 || !qualification)
+      res.json({ msg: "fields cannot be blank!" });
 
     const qualify = await TQualification({
       qualification,

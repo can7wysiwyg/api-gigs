@@ -66,8 +66,7 @@ SubjectRouter.put("/subject/edit_subject/:id", verify, asyncHandler(async(req, r
 
   await Subject.findByIdAndUpdate(
     subject,
-    req.body,
-  {new: true}
+    req.body
   )
 
   res.json({msg: "the subject has been successfully updated"})
