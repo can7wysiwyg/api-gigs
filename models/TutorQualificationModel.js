@@ -18,11 +18,13 @@ const QualificationSchema = mongoose.Schema({
         required: true
     },
     tutorSpecialty2: {
-        type: String
+        type: String,
+        default: null
 
     },
     tutorSpecialty3: {
-        type: String
+        type: String,
+        default: null
 
     }
 

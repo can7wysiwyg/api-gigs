@@ -52,6 +52,17 @@ QualiRoute.post(
 );
 
 QualiRoute.get(
+  "/qualification/show_all/:id",
+  asyncHandler(async (req, res) => {
+    const{id} = req.params
+    await TQualification.find({ owner: id }).then((owner) => {
+      res.json({ owner });
+    });
+  })
+);
+
+
+QualiRoute.get(
   "/qualification/owner_view",
   verify,
   asyncHandler(async (req, res) => {

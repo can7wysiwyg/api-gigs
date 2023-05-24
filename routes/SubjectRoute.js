@@ -12,6 +12,14 @@ SubjectRouter.get("/subject/show_all", asyncHandler(async(req, res) => {
     res.json({subject})
 }))
 
+SubjectRouter.get("/subject/show_users/:id", asyncHandler(async(req, res) => {
+  const{id} = req.params
+  
+  await Subject.find({ subjectOwner: id }).then((subjects) =>
+      res.json({ subjects })
+    );
+}))
+
 
 SubjectRouter.post(
   "/subject/create_subject",
