@@ -20,6 +20,15 @@ SubjectRouter.get("/subject/show_users/:id", asyncHandler(async(req, res) => {
     );
 }))
 
+SubjectRouter.get("/subject/single/:id", asyncHandler(async(req, res) => {
+  const{id} = req.params
+
+  const singled = await Subject.findById(id)
+
+  res.json({singled})
+
+}))
+
 
 SubjectRouter.post(
   "/subject/create_subject",
