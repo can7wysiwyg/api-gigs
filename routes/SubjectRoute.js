@@ -7,7 +7,7 @@ const User = require("../models/UserModel");
 
 SubjectRouter.get("/subject/show_all", asyncHandler(async(req, res) => {
 
-    const subject = await Subject.find()
+    const subject = await Subject.find().sort({ _id: -1 })
 
     res.json({subject})
 }))

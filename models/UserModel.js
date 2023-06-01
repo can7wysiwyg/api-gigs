@@ -6,9 +6,6 @@ const UserSchema = mongoose.Schema({
     data: Buffer,
     contentType: String,
 
-    
-    
-
    },
    fullname: {
     type: String,
@@ -40,6 +37,10 @@ const UserSchema = mongoose.Schema({
         required: true
     },
     admin: {
+        type: Number,
+        default: 0
+    },
+    role: {
         type: Number,
         default: 0
     },
