@@ -7,10 +7,19 @@ const User = require("../models/UserModel");
 
 SubjectRouter.get("/subject/show_all", asyncHandler(async(req, res) => {
 
-    const subject = await Subject.find().sort({ _id: -1 })
+    const subject = await Subject.find().sort({_id: -1})
 
     res.json({subject})
 }))
+
+SubjectRouter.get("/subject/show_single_cat/sc", asyncHandler(async(req, res) => {
+  const subjectsCat = await Subject.find({subjectCategory: req.query.cat})
+
+  res.json({subjectsCat})
+}))
+
+
+
 
 SubjectRouter.get("/subject/show_users/:id", asyncHandler(async(req, res) => {
   const{id} = req.params
@@ -34,15 +43,16 @@ SubjectRouter.post(
   "/subject/create_subject",
   verify,
   asyncHandler(async (req, res) => {
-    const { subjectName, subjectPrice, subjectCommentary } = req.body;
+    const { subjectName, subjectPrice, subjectCommentary, subjectCategory } = req.body;
 
-    if (!subjectName || !subjectPrice || !subjectCommentary)
+    if (!subjectName || !subjectPrice || !subjectCommentary || !subjectCategory)
       res.json({ msg: "fields cannot be blank!" });
 
     const subject = await Subject({
       subjectName,
       subjectPrice,
       subjectCommentary,
+      subjectCategory,
       subjectOwner: req.user.id,
     })
       

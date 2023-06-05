@@ -17,6 +17,10 @@ const SubjectSchema = mongoose.Schema({
     subjectCommentary: {
         type: String,
         required: true
+    },
+    subjectCategory: {
+        type: String,
+        required: true
     }
 
 
