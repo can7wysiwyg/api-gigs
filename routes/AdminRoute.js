@@ -62,4 +62,13 @@ AdminRoute.get('/admin/playing/p', asyncHandler(async(req, res) => {
     res.json({zoto})
 }))
 
+AdminRoute.delete('/admin/delete_category/:id', verify, authAdmin, asyncHandler(async(req, res) => {
+
+const{id} = req.params
+
+await Category.findByIdAndDelete(id)
+
+
+}))
+
 module.exports = AdminRoute
