@@ -14,39 +14,31 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+Auth.post('/auth/register', async (req, res) => {
+  const { fullname, username, email, password, phoneNumber, securityAnswer } = req.body;
 
+  if (!fullname || !username || !email || !password || !phoneNumber || !securityAnswer) {
+    return res.json({ msg: "Fields cannot be blank" });
+  }
 
+  const usernameExists = await User.findOne({ username });
+  if (usernameExists) {
+    return res.json({ msg: "The username you chose exists, please use another" });
+  }
 
+  const emailExists = await User.findOne({ email });
+  if (emailExists) {
+    return res.json({ msg: "The email exists, please use another" });
+  }
 
-Auth.post('/auth/register',   asyncHandler(async(req, res) => {
-    const{fullname, username, email, password, phoneNumber, securityAnswer} = req.body
+  if (!req.files || !req.files.userImage) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
 
-    if(!fullname || !username || !email || !password || !phoneNumber || !securityAnswer) res.json({msg: "fields cannot be blank"})
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-
-    const usernameExists = await  User.findOne({ username });
-
-    if (usernameExists) {
-      res.json({ msg: "The username you chose exists, please user another" });
-    }
-
-    const emailExists = await  User.findOne({ email });
-
-    if (emailExists) {
-      res.json({ msg: "The email exists, please user another" });
-    }
-
-    if (!req.files || !req.files.userImage) {
-      return res.status(400).json({ message: 'No file uploaded' });}
-    
-
-    
-  
-  const salt =  await bcrypt.genSalt(10);
-  const hashedPassword = await  bcrypt.hash(password, salt);
-  
-
-  const file = req.files.bookImage;
+  const file = req.files.userImage;
 
   cloudinary.uploader.upload(file.tempFilePath, {
     folder: 'testImage',
@@ -54,7 +46,10 @@ Auth.post('/auth/register',   asyncHandler(async(req, res) => {
     height: 150,
     crop: "fill"
   }, async (err, result) => {
-    if (err) throw err;
+    if (err) {
+      console.error("Error uploading user image:", err);
+      return res.status(500).json({ msg: "Failed to upload user image" });
+    }
 
     removeTmp(file.tempFilePath);
 
@@ -65,18 +60,17 @@ Auth.post('/auth/register',   asyncHandler(async(req, res) => {
       phoneNumber,
       securityAnswer,
       userImage: result.secure_url,
-        password: hashedPassword
-      })
-    
-      res.json({msg: "your account has been successfully created!"})
-    
-    
-    })
-  
-  
-   
+      password: hashedPassword
+    });
 
-}))
+    res.json({ msg: "Your account has been successfully created!" });
+  });
+});
+
+
+
+
+
 
 
 Auth.post("/auth/login", asyncHandler(async(req, res) => {
