@@ -4,29 +4,12 @@ const asyncHandler = require("express-async-handler")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verify = require("../middleware/verify");
-const authAdmin = require("../middleware/authAdmin");
-const multer = require("multer");
-const path = require('path');
 const fs = require("fs");
 
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(__dirname, '..', 'public'));
-  },
-  filename: function (req, file, cb) {
-    cb(null, new Date().toISOString().replace(/:/g, "-") + file.originalname);
-  },
-});
 
 
-const upload = multer({ storage });
-
-// 
-// upload.single("userImage"),
-
-
-Auth.post('/auth/register', upload.single("userImage"),  asyncHandler(async(req, res) => {
+Auth.post('/auth/register',   asyncHandler(async(req, res) => {
     const{fullname, username, email, password, phoneNumber, securityAnswer} = req.body
 
     if(!fullname || !username || !email || !password || !phoneNumber || !securityAnswer) res.json({msg: "fields cannot be blank"})
@@ -55,10 +38,7 @@ Auth.post('/auth/register', upload.single("userImage"),  asyncHandler(async(req,
     email,
     phoneNumber,
     securityAnswer,
-    userImage: { 
-      data: fs.readFileSync("./public/" + req.file.filename),
-      contentType: "image/jpg"
-      },
+    userImage,
     password: hashedPassword
   })
 

@@ -3,25 +3,14 @@ const TQualification = require("../models/TutorQualificationModel");
 const User = require("../models/UserModel");
 const asyncHandler = require("express-async-handler");
 const verify = require("../middleware/verify");
-const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(__dirname, "..", "public"));
-  },
-  filename: function (req, file, cb) {
-    cb(null, new Date().toISOString().replace(/:/g, "-") + file.originalname);
-  },
-});
 
 const upload = multer({ storage });
 
 QualiRoute.post(
   "/qualification/create_qualification",
   verify,
-  upload.single("qualificationImage"),
   asyncHandler(async (req, res) => {
     const { qualification, tutorSpecialty1, tutorSpecialty2, tutorSpecialty3 } =
       req.body;
@@ -35,10 +24,7 @@ QualiRoute.post(
       tutorSpecialty2,
       tutorSpecialty3,
       owner: req.user.id,
-      qualificationImage: {
-        data: fs.readFileSync("./public/" + req.file.filename),
-        contentType: "image/jpg",
-      },
+      qualificationImage
     });
 
     await qualify.save().then((error) => {

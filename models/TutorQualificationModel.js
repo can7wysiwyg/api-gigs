@@ -10,8 +10,8 @@ const QualificationSchema = mongoose.Schema({
     },
     qualificationImage: {
 
-        data: Buffer,
-    contentType: String,
+       type: String,
+       required: true
      },
    tutorSpecialty1: {
         type: String,
