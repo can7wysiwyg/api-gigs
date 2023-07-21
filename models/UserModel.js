@@ -36,10 +36,6 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    admin: {
-        type: Number,
-        default: 0
-    },
     role: {
         type: Number,
         default: 0

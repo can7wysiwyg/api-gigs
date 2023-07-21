@@ -6,7 +6,7 @@ const verify = require("../middleware/verify");
 const fs = require("fs");
 
 
-const upload = multer({ storage });
+
 
 QualiRoute.post(
   "/qualification/create_qualification",

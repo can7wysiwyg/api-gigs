@@ -1,12 +1,89 @@
 const AdminRoute = require('express').Router()
 const asyncHandler = require('express-async-handler')
-const verify = require('../middleware/verify')
 const authAdmin = require('../middleware/authAdmin')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const verifyAdmin = require("../middleware/verifyAdmin");
 const User = require('../models/UserModel')
+const Admin = require('../models/AdminModel')
 const Category = require('../models/CategoryModel')
 
 
-AdminRoute.delete('/admin/delete_user/:id', verify, authAdmin, asyncHandler(async(req, res) => {
+AdminRoute.post('/admin/register',   asyncHandler(async(req, res) => {
+    const{name, email, password} = req.body
+
+    if(!name || !email || !password) res.json({msg: "fields cannot be blank"})
+
+
+
+
+    const emailExists = await  Admin.findOne({ email });
+
+    if (emailExists) {
+      res.json({ msg: "The email exists, please user another one or login" });
+    }
+
+    
+  
+  const salt =  await bcrypt.genSalt(10);
+  const hashedPassword = await  bcrypt.hash(password, salt);
+
+   await Admin.create({
+    name,
+    email,
+    password: hashedPassword
+  })
+
+  res.json({msg: "your account has been successfully created!"})
+
+
+
+}))
+
+
+AdminRoute.post("/admin/login", asyncHandler(async(req, res) => {
+    const { email, password } = req.body;
+
+    const userExists = await Admin.findOne({ email }).select("+password");
+    
+
+    if (!userExists) {
+      res.json({
+        msg: "No user associated with this username exists in our system. Please register.",
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, userExists.password);
+
+    if (passwordMatch) {
+      
+      let refreshtoken = createRefreshToken({id: userExists._id})
+
+      res.cookie('refreshtoken', refreshtoken, { expire: new Date() + 9999 });
+
+      jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_ADMIN, (err, admin) =>{
+        if(err) return res.status(400).json({msg: "Please Login or Register"})
+    
+        const accesstoken = createAccessToken({id: admin.id})
+        
+    
+        res.json({accesstoken}) })
+
+
+      
+    } else {
+      res.json({ msg: "check your password again" });
+    } 
+
+
+    
+}))
+
+
+
+
+
+AdminRoute.delete('/admin/delete_user/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
     const{id} = req.params
 
@@ -17,7 +94,7 @@ AdminRoute.delete('/admin/delete_user/:id', verify, authAdmin, asyncHandler(asyn
 }))
 
 
-AdminRoute.put('/admin/suspend_account/:id',  verify, authAdmin, asyncHandler(async(req, res) => {
+AdminRoute.put('/admin/suspend_account/:id',  verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
 
 
@@ -31,7 +108,7 @@ res.json({msg: "account has been succesfully updated"})
 }))
 
 
-AdminRoute.post('/admin/create_category', verify, authAdmin, asyncHandler(async(req, res) => {
+AdminRoute.post('/admin/create_category', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
     const{catName} = req.body
 
@@ -53,16 +130,8 @@ AdminRoute.get('/admin/show_categories', asyncHandler(async(req, res) => {
     res.json({results})
 }))
 
-AdminRoute.get('/admin/playing/p', asyncHandler(async(req, res) => {
-      
-        
 
-    const zoto = await Category.find({catName: req.query.name })
-
-    res.json({zoto})
-}))
-
-AdminRoute.delete('/admin/delete_category/:id', verify, authAdmin, asyncHandler(async(req, res) => {
+AdminRoute.delete('/admin/delete_category/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
 const{id} = req.params
 
@@ -70,5 +139,18 @@ await Category.findByIdAndDelete(id)
 
 
 }))
+
+
+const createAccessToken = (admin) =>{
+    return jwt.sign(admin, process.env.ACCESS_TOKEN_ADMIN, {expiresIn: '7d'})
+  }
+  const createRefreshToken = (admin) =>{
+    return jwt.sign(admin, process.env.REFRESH_TOKEN_ADMIN, {expiresIn: '7d'})
+  }
+  
+
+
+
+
 
 module.exports = AdminRoute

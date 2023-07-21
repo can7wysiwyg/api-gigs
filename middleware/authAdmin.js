@@ -1,16 +1,16 @@
-const User = require('../models/UserModel')
+const Admin = require('../models/AdminModel')
 const asyncHandler = require('express-async-handler')
 
 const authAdmin = asyncHandler(async(req, res, next) => {
 
-    const user = await User.findOne({
-        _id: req.user.id
+    const admin = await Admin.findOne({
+        _id: req.admin.id
     })
 
 
     
 
-    if(user.admin === 0 ) return res.json({msg: "you are not an admin"})
+    if(admin.admin === 0 ) return res.json({msg: "you are not an admin"})
 
     next()
 
