@@ -80,6 +80,29 @@ AdminRoute.post("/admin/login", asyncHandler(async(req, res) => {
 }))
 
 
+AdminRoute.get('/admin/user',verifyAdmin, asyncHandler(async(req, res) => {
+  try{
+    const admin = await Admin.findById(req.user).select('-password')
+    if(!admin) return res.status(400).json({msg: "this admin does not exist d does not exist."})
+  
+    res.json(user)
+  // console.log(user);
+  
+  // res.json(req.user)
+  
+  }
+    catch(err) {
+      return res.status(500).json({msg: err.message})
+  
+  
+    }
+  
+  
+  }))
+
+
+
+
 
 
 

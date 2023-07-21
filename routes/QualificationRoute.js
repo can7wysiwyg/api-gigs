@@ -4,38 +4,54 @@ const User = require("../models/UserModel");
 const asyncHandler = require("express-async-handler");
 const verify = require("../middleware/verify");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+QualiRoute.post("/qualification/create_qualification", verify, async (req, res) => {
+  const { qualification, tutorSpecialty1, tutorSpecialty2, tutorSpecialty3 } = req.body;
+
+  if (!tutorSpecialty1 || !qualification) {
+    return res.json({ msg: "Fields cannot be blank!" });
+  }
+
+  if (!req.files || !req.files.qualificationImage) {
+    return res.status(400).json({ msg: "Qualification image is required." });
+  }
+
+  const qualify = new TQualification({
+    qualification,
+    tutorSpecialty1,
+    tutorSpecialty2,
+    tutorSpecialty3,
+    owner: req.user.id,
+  });
+
+  try {
+    
+    const qualificationImage = req.files.qualificationImage;
+    const result = await cloudinary.uploader.upload(qualificationImage.tempFilePath);
+
+    
+    qualify.qualificationImage = result.secure_url;
+
+    await qualify.save();
+
+    res.json({ msg: "You have successfully created your qualification!" });
+  } catch (error) {
+    console.error("Error creating qualification:", error);
+    res.status(500).json({ msg: "Failed to create qualification." });
+  }
+});
 
 
 
 
-QualiRoute.post(
-  "/qualification/create_qualification",
-  verify,
-  asyncHandler(async (req, res) => {
-    const { qualification, tutorSpecialty1, tutorSpecialty2, tutorSpecialty3 } =
-      req.body;
-
-    if (!tutorSpecialty1 || !qualification)
-      res.json({ msg: "fields cannot be blank!" });
-
-    const qualify = await TQualification({
-      qualification,
-      tutorSpecialty1,
-      tutorSpecialty2,
-      tutorSpecialty3,
-      owner: req.user.id,
-      qualificationImage
-    });
-
-    await qualify.save().then((error) => {
-      if (!error) {
-        TQualification.find({}).populate("owner").exec();
-      }
-    });
-
-    res.json({ msg: "you have successfully created your qualification!" });
-  })
-);
 
 QualiRoute.get(
   "/qualification/show_all/:id",

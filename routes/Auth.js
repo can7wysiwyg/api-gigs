@@ -5,6 +5,15 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verify = require("../middleware/verify");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
 
 
 
@@ -27,24 +36,45 @@ Auth.post('/auth/register',   asyncHandler(async(req, res) => {
       res.json({ msg: "The email exists, please user another" });
     }
 
+    if (!req.files || !req.files.userImage) {
+      return res.status(400).json({ message: 'No file uploaded' });}
+    
+
     
   
   const salt =  await bcrypt.genSalt(10);
   const hashedPassword = await  bcrypt.hash(password, salt);
+  
 
-   await User.create({
-    fullname,
-    username,
-    email,
-    phoneNumber,
-    securityAnswer,
-    userImage,
-    password: hashedPassword
-  })
+  const file = req.files.bookImage;
 
-  res.json({msg: "your account has been successfully created!"})
+  cloudinary.uploader.upload(file.tempFilePath, {
+    folder: 'testImage',
+    width: 150,
+    height: 150,
+    crop: "fill"
+  }, async (err, result) => {
+    if (err) throw err;
 
+    removeTmp(file.tempFilePath);
 
+    await User.create({
+      fullname,
+      username,
+      email,
+      phoneNumber,
+      securityAnswer,
+      userImage: result.secure_url,
+        password: hashedPassword
+      })
+    
+      res.json({msg: "your account has been successfully created!"})
+    
+    
+    })
+  
+  
+   
 
 }))
 
@@ -178,3 +208,10 @@ const createAccessToken = (user) =>{
 
 
 module.exports = Auth
+
+
+function removeTmp(filePath) {
+  fs.unlink(filePath, err => {
+    if (err) throw err;
+  });
+}
