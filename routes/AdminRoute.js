@@ -113,6 +113,16 @@ res.json({msg: "user has been succesfully updated"})
 }))
 
 
+AdminRoute.get('/admin/single_user/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
+
+const {id} = req.params
+
+const user = await User.findById({_id: id})
+
+res.json({user})
+
+}))
+
 
 
 AdminRoute.delete('/admin/delete_user/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
@@ -171,6 +181,9 @@ await Category.findByIdAndDelete(id)
 
 
 }))
+
+
+
 
 
 const createAccessToken = (admin) =>{
