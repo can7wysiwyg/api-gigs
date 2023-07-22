@@ -101,7 +101,16 @@ AdminRoute.get('/admin/user',verifyAdmin, asyncHandler(async(req, res) => {
   }))
 
 
+AdminRoute.put('/admin/update_user/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
 
+const {id} = req.params
+
+await User.findByIdAndUpdate(id, req.body, {new: true})
+
+res.json({msg: "user has been succesfully updated"})
+
+
+}))
 
 
 
