@@ -12,31 +12,31 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-
-
-UserRoute.put("/user/update_profile_pic/:id", verify, async (req, res) => {
+UserRoute.put("/user/profile_pic/:id", verify, async (req, res) => {
   const { id } = req.params;
 
-  const owner = await User.findById(id);
-  const owned = await User.findById(req.user);
-
-  if (owner._id.toString() !== owned._id.toString()) {
-    return res.json({ msg: "Access is denied." });
-  }
-
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).json({ msg: "No files were uploaded." });
-  }
-
-  
-  const userImage = req.files.userImage;
-
   try {
-    
-    const result = await cloudinary.uploader.upload(userImage.tempFilePath);
+    const owner = await User.findById(id);
+    const owned = await User.findById(req.user);
 
+    if (owner._id.toString() !== owned._id.toString()) {
+      return res.json({ msg: "Access is denied." });
+    }
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ msg: "No files were uploaded." });
+    }
+
+    const userImage = req.files.userImage;
+
+    if (!userImage) {
+      return res.status(400).json({ msg: "No image was selected." });
+    }
+
+    const result = await cloudinary.uploader.upload(userImage.tempFilePath);
     
-    await User.findByIdAndUpdate(owner._id, { userImageUrl: result.secure_url }, { new: true });
+
+    await User.findByIdAndUpdate(owner._id, { userImage: result.secure_url });
 
     res.json({ msg: "Profile picture successfully updated." });
   } catch (error) {
@@ -44,6 +44,8 @@ UserRoute.put("/user/update_profile_pic/:id", verify, async (req, res) => {
     res.status(500).json({ msg: "Failed to update profile picture." });
   }
 });
+
+
 
 
 
