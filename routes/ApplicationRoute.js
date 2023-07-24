@@ -13,7 +13,7 @@ AppRoute.post('/user/application_form/:id', verify, asyncHandler(async(req, res)
 
     if(!description) res.json({msg: "this field cannot be empty.."})
 
-    const testimonial = new Testimonial({
+    const testimonial = new Apply({
         description,
         owner: req.user.id
     })
