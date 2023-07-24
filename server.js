@@ -11,6 +11,7 @@ const SubjectRouter = require("./routes/SubjectRoute")
 const QualiRoute = require("./routes/QualificationRoute")
 const UserRoute = require("./routes/UserRoute")
 const AdminRoute = require("./routes/AdminRoute")
+const AppRoute = require("./routes/ApplicationRoute")
 
 
 
@@ -40,6 +41,7 @@ db.once('open', function(){
   app.use(QualiRoute)
   app.use(UserRoute)
   app.use(AdminRoute)
+  app.use(AppRoute)
 
 
 
