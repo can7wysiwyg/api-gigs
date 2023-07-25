@@ -38,7 +38,7 @@ const UserSchema = mongoose.Schema({
     },
     role: {
         type: Number,
-        default: 0
+        default: 1
     },
     facebookLink: {
         type: String,
