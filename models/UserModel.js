@@ -42,7 +42,7 @@ const UserSchema = mongoose.Schema({
     },
     facebookLink: {
         type: String,
-        default: " "
+        default: ""
     },
     whatsappLink: {
         type: String,
