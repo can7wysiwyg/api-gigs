@@ -2,15 +2,13 @@ const AppRoute = require('express').Router()
 const verify = require('../middleware/verify')
 const asyncHandler = require('express-async-handler')
 const Apply = require('../models/ApplicationModel')
-const User = require('../models/UserModel')
 
 
 
-AppRoute.post('/user/application_form/:id', verify, asyncHandler(async(req, res) => {
+AppRoute.post('/user/application_form', verify, asyncHandler(async(req, res) => {
 
     const {description} = req.body
-    const {id} = req.params
-
+    
     if(!description) res.json({msg: "this field cannot be empty.."})
 
     const testimonial = new Apply({
@@ -24,13 +22,22 @@ AppRoute.post('/user/application_form/:id', verify, asyncHandler(async(req, res)
         }
       });
 
-      await User.findByIdAndUpdate(id, {role: 1}, {new: true})
-
+     
 
       res.json({msg: "Congratulations..."})
   
 
 
+
+}))
+
+
+AppRoute.get("/user/show_review/:id", verify,  asyncHandler(async(req, res) => {
+  const {id} = req.params
+
+const result = await Apply.findOne({owner: id})
+
+res.json({result})
 
 }))
 
