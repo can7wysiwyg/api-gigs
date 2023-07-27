@@ -7,6 +7,7 @@ const verifyAdmin = require("../middleware/verifyAdmin");
 const User = require('../models/UserModel')
 const Admin = require('../models/AdminModel')
 const Category = require('../models/CategoryModel')
+const Subject = require("../models/SubjectModel")
 
 
 AdminRoute.post('/admin/register',   asyncHandler(async(req, res) => {
@@ -132,6 +133,16 @@ AdminRoute.delete('/admin/delete_user/:id', verifyAdmin, authAdmin, asyncHandler
     await User.findByIdAndDelete(id)
 
     res.json({msg: "user has been successfully deleted"})
+
+}))
+
+
+AdminRoute.delete('/admin/delete_subject/:id', verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
+const{id} = req.params
+
+await Subject.findByIdAndDelete(id)
+
+res.json({msg: "subject deleted successfully!!"})
 
 }))
 
