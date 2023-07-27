@@ -8,6 +8,7 @@ const User = require('../models/UserModel')
 const Admin = require('../models/AdminModel')
 const Category = require('../models/CategoryModel')
 const Subject = require("../models/SubjectModel")
+const TQualification = require("../models/TutorQualificationModel")
 
 
 AdminRoute.post('/admin/register',   asyncHandler(async(req, res) => {
@@ -143,6 +144,18 @@ const{id} = req.params
 await Subject.findByIdAndDelete(id)
 
 res.json({msg: "subject deleted successfully!!"})
+
+}))
+
+
+AdminRoute.delete("/admin/delete_qualification/:id", verifyAdmin, authAdmin, asyncHandler(async(req, res) => {
+
+const {id} = req.params
+
+await TQualification.findByIdAndDelete(id)
+
+res.json({msg: "qualification has successfully been deleted..."})
+
 
 }))
 
